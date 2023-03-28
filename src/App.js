@@ -1,25 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import {useState, useEffect} from "react";
+
+const url = 'http://localhost:8080/categories';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [categories, setCategories] = useState([]);
+    const [isError, setIsError] = useState(false)
+
+    const getData = async () => {
+        try {
+            const {data} = await axios.get(url);
+            setCategories(data);
+            setIsError(false);
+        } catch (error) {
+            setCategories([]);
+            setIsError(true);
+        }
+    }
+
+    useEffect(() => {
+        getData();
+        // eslint-disable-next-line
+    }, []);
+
+    return (
+        <>
+            <section className='page'>
+                <header className='header'>
+                    <h1>Kolekcje lektur pobrane z serwisu "Wolnelektury.pl"</h1>
+                </header>
+
+                {isError && <p className='warning'>Not Found</p>}
+
+                {categories.map((item, index) => {
+                    const {title} = item;
+                    return (
+                        <article key={index} className='item'>
+                            <div className='index'>{index + 1}</div>
+                            <p className='title'>{title}</p>
+                        </article>
+                    )
+                })}
+            </section>
+        </>
+    );
 }
 
 export default App;
